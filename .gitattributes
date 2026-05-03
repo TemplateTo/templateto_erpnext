@@ -1,0 +1,11 @@
+# Force LF line endings for shell scripts so they work in Linux containers
+# even when checked out on Windows with autocrlf=true
+*.sh text eol=lf
+
+# Python source files
+*.py text eol=lf
+*.json text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf

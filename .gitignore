@@ -1,0 +1,38 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.eggs/
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+.env
+.env.local
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.log
+
+# Local dev artifacts
+screenshots/
+.playwright-cli/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Playwright snapshot dumps
+*-snapshot.yml
+after-*.yml
+settings-*.yml
+ready-to-test.yml
+setup-wizard.yml
+wizard-*.yml
+invoice-list.yml
+login*.yml

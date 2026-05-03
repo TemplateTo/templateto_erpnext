@@ -1,0 +1,78 @@
+# Local Frappe v15 / ERPNext v15 dev environment for templateto_reports.
+#
+# Usage:
+#   docker compose up -d                    # First boot: init service runs ~5-10 minutes
+#   docker compose logs -f init             # Watch the init progress
+#   docker compose logs -f frappe           # Watch the bench dev server
+#
+# Once init exits with code 0 and `frappe` is up, open:
+#   http://localhost:8000  →  Administrator / admin
+#
+# The ./templateto_reports directory is mounted into the container, so host edits
+# are picked up. Restart the frappe service after changing Python code:
+#   docker compose restart frappe
+
+services:
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+      - --skip-innodb-read-only-compressed
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis-cache:
+    image: redis:6.2-alpine
+
+  redis-queue:
+    image: redis:6.2-alpine
+
+  init:
+    image: frappe/bench:latest
+    user: frappe
+    working_dir: /home/frappe
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      redis-cache:
+        condition: service_started
+      redis-queue:
+        condition: service_started
+    volumes:
+      - bench_data:/home/frappe
+      - .:/mnt/templateto_reports_repo:ro
+      - ./init.sh:/home/frappe/init.sh:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["bash", "/home/frappe/init.sh"]
+    restart: "no"
+
+  frappe:
+    image: frappe/bench:latest
+    user: frappe
+    working_dir: /home/frappe/frappe-bench
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+      - "9000:9000"
+    volumes:
+      - bench_data:/home/frappe
+      - .:/mnt/templateto_reports_repo:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: ["bash", "-c", "bench start"]
+
+volumes:
+  mariadb_data:
+  bench_data:

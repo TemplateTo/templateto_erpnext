@@ -1,0 +1,72 @@
+{
+    "name": "TemplateTo Settings",
+    "module": "TemplateTo Reports",
+    "doctype": "DocType",
+    "issingle": 1,
+    "is_submittable": 0,
+    "editable_grid": 0,
+    "track_changes": 0,
+    "engine": "InnoDB",
+    "fields": [
+        {
+            "fieldname": "enabled",
+            "fieldtype": "Check",
+            "label": "Enable TemplateTo for PDF Rendering",
+            "default": "0",
+            "bold": 1,
+            "description": "When enabled, all PDF generation uses TemplateTo's Chrome-based rendering instead of wkhtmltopdf"
+        },
+        {
+            "fieldname": "sb_connection",
+            "fieldtype": "Section Break",
+            "label": "Connection",
+            "depends_on": "eval:doc.enabled"
+        },
+        {
+            "fieldname": "api_key",
+            "fieldtype": "Password",
+            "label": "API Key",
+            "description": "Your TemplateTo API key — get one at <a href='https://app.templateto.com' target='_blank'>app.templateto.com</a>"
+        },
+        {
+            "fieldname": "api_endpoint",
+            "fieldtype": "Data",
+            "label": "API Endpoint",
+            "default": "https://api.templateto.com",
+            "description": "Only change if directed by TemplateTo support"
+        },
+        {
+            "fieldname": "cb_connection",
+            "fieldtype": "Column Break"
+        },
+        {
+            "fieldname": "test_connection",
+            "fieldtype": "Button",
+            "label": "Test Connection",
+            "depends_on": "eval:doc.enabled && doc.api_key"
+        },
+        {
+            "fieldname": "sb_fallback",
+            "fieldtype": "Section Break",
+            "label": "Fallback",
+            "depends_on": "eval:doc.enabled"
+        },
+        {
+            "fieldname": "fallback_enabled",
+            "fieldtype": "Check",
+            "label": "Fallback to wkhtmltopdf on API failure",
+            "default": "1",
+            "description": "If the TemplateTo API is unreachable or returns an error, silently fall back to wkhtmltopdf. Recommended to keep enabled."
+        }
+    ],
+    "permissions": [
+        {
+            "role": "System Manager",
+            "read": 1,
+            "write": 1,
+            "create": 1
+        }
+    ],
+    "sort_field": "modified",
+    "sort_order": "DESC"
+}
