@@ -4,16 +4,27 @@
 
 set -e
 
+# Frappe branch comes from the FRAPPE_BRANCH env var (set by docker-compose).
+# Defaults to version-15 if unset.
+FRAPPE_BRANCH="${FRAPPE_BRANCH:-version-15}"
+echo ">>> Initialising bench for Frappe branch: $FRAPPE_BRANCH"
+
 cd /home/frappe
 
 # 1. Initialise the bench (only first time).
-# Frappe v15 supports Python 3.10-3.12. Pin to /usr/bin/python3.11 so we don't
-# pick up the pyenv default (which may be 3.14, too new for v15).
+# Frappe v15 supports Python 3.10–3.12 — use 3.11 (system default).
+# Frappe v16 (16.17.2+) requires Python >=3.14,<3.15 — use pyenv 3.14.
+case "$FRAPPE_BRANCH" in
+  version-15) PYTHON_BIN=/usr/bin/python3.11 ;;
+  *)          PYTHON_BIN=/home/frappe/.pyenv/shims/python3.14 ;;
+esac
+echo ">>> Using Python: $PYTHON_BIN"
+
 if [ ! -d frappe-bench ]; then
   echo ">>> bench init (this takes ~3-5 minutes)..."
   bench init \
-    --frappe-branch version-15 \
-    --python /usr/bin/python3.11 \
+    --frappe-branch "$FRAPPE_BRANCH" \
+    --python "$PYTHON_BIN" \
     --skip-redis-config-generation \
     --no-backups \
     frappe-bench
@@ -29,10 +40,10 @@ bench set-config -g redis_cache "redis://redis-cache:6379"
 bench set-config -g redis_queue "redis://redis-queue:6379"
 bench set-config -g redis_socketio "redis://redis-queue:6379"
 
-# 3. Get ERPNext (only first time).
+# 3. Get ERPNext (only first time). Same branch as Frappe.
 if [ ! -d apps/erpnext ]; then
   echo ">>> bench get-app erpnext (this takes ~2-3 minutes)..."
-  bench get-app --branch version-15 erpnext
+  bench get-app --branch "$FRAPPE_BRANCH" erpnext
 fi
 
 # 4. Get our templateto_reports app from the mounted volume (only first time).

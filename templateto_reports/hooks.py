@@ -16,6 +16,10 @@ required_apps = ["frappe"]
 pdf_generator = "templateto_reports.pdf_override.get_pdf_via_hook"
 
 # The "templatetocloud" option is added to Print Format's pdf_generator select
-# field via a patch (templateto_reports.patches.v1_0.add_pdf_generator_option).
-# `property_setters` is NOT a valid hooks.py key in Frappe v15 — patches are the
-# canonical way to ship Property Setters with an app.
+# field by `setup.add_pdf_generator_option()`, which runs from both:
+#   - `after_install` hook (covers fresh installs — patches are pre-marked as
+#     applied during install-app and never run)
+#   - The patches/v1_0/add_pdf_generator_option.py patch (covers upgrades from
+#     older versions of this app)
+# Both call the same idempotent helper.
+after_install = "templateto_reports.setup.add_pdf_generator_option"

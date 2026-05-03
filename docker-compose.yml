@@ -1,15 +1,18 @@
-# Local Frappe v15 / ERPNext v15 dev environment for templateto_reports.
+# Local Frappe / ERPNext dev environment for templateto_reports.
 #
-# Usage:
+# Defaults to v15 on port 8000. To run v16 in parallel on port 8016:
+#   FRAPPE_BRANCH=version-16 PORT=8016 docker compose -p tt-erpnext-v16 up -d
+#
+# Usage (v15, default):
 #   docker compose up -d                    # First boot: init service runs ~5-10 minutes
 #   docker compose logs -f init             # Watch the init progress
 #   docker compose logs -f frappe           # Watch the bench dev server
 #
 # Once init exits with code 0 and `frappe` is up, open:
-#   http://localhost:8000  →  Administrator / admin
+#   http://localhost:${PORT:-8000}  →  Administrator / admin
 #
-# The ./templateto_reports directory is mounted into the container, so host edits
-# are picked up. Restart the frappe service after changing Python code:
+# The repo dir is mounted into the container, so host edits are picked up.
+# Restart the frappe service after changing Python code:
 #   docker compose restart frappe
 
 services:
@@ -40,6 +43,8 @@ services:
     image: frappe/bench:latest
     user: frappe
     working_dir: /home/frappe
+    environment:
+      FRAPPE_BRANCH: ${FRAPPE_BRANCH:-version-15}
     depends_on:
       mariadb:
         condition: service_healthy
@@ -64,8 +69,8 @@ services:
       init:
         condition: service_completed_successfully
     ports:
-      - "8000:8000"
-      - "9000:9000"
+      - "${PORT:-8000}:8000"
+      - "${SOCKETIO_PORT:-9000}:9000"
     volumes:
       - bench_data:/home/frappe
       - .:/mnt/templateto_reports_repo:ro

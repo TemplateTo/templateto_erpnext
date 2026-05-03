@@ -1,23 +1,11 @@
-"""Add `templatetocloud` (and `chrome`) as options on the Print Format
-`pdf_generator` select field.
+"""Patch wrapper that calls the shared setup helper.
 
-On stock Frappe v15 the field only ships with `wkhtmltopdf`. We add our option
-plus `chrome` so existing Print Designer / v16 Chrome configurations aren't
-broken.
-
-Idempotent: `make_property_setter` updates the existing Property Setter if one
-already exists for the field+property combo.
+Runs on `bench migrate` for users upgrading from a previous version of this
+app (where the after_install hook already fired). Idempotent.
 """
 
-from frappe.custom.doctype.property_setter.property_setter import make_property_setter
+from templateto_reports.setup import add_pdf_generator_option
 
 
 def execute():
-    make_property_setter(
-        doctype="Print Format",
-        fieldname="pdf_generator",
-        property="options",
-        value="wkhtmltopdf\ntemplatetocloud\nchrome",
-        property_type="Text",
-        for_doctype=False,
-    )
+    add_pdf_generator_option()
