@@ -6,9 +6,11 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "TemplateTo", email = "david@templateto.com" }]
-# Frappe Cloud Marketplace requires a bounded Frappe dependency in pyproject.toml.
-# This is the `version-15` branch — pinned to Frappe 15.x only.
-dependencies = ["requests", "frappe>=15.0,<16.0"]
+# Frappe itself is provided by the bench environment, not pip — listing it as
+# a dependency makes uv try to resolve it from PyPI (which fails because
+# frappe uses URL-based deps for pypika). The Frappe version constraint is
+# declared via `required_apps` in hooks.py instead.
+dependencies = ["requests"]
 
 [build-system]
 requires = ["flit_core>=3.4"]
