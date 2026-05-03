@@ -7,9 +7,8 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "TemplateTo", email = "david@templateto.com" }]
 # Frappe Cloud Marketplace requires a bounded Frappe dependency in pyproject.toml.
-# The `main` branch supports both Frappe 15 and 16; the `version-15` and
-# `version-16` branches narrow this to a single major.
-dependencies = ["requests", "frappe>=15.0,<17.0"]
+# This is the `version-15` branch — pinned to Frappe 15.x only.
+dependencies = ["requests", "frappe>=15.0,<16.0"]
 
 [build-system]
 requires = ["flit_core>=3.4"]
